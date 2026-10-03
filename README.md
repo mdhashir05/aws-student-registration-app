@@ -1,61 +1,66 @@
 # AWS Student Registration Web Application
 
-A PHP-based student registration web application deployed on **Amazon EC2** and connected to **Amazon RDS for MySQL** inside a custom Amazon VPC. This hands-on project demonstrates foundational AWS networking, compute, database connectivity, and web application deployment.
+A PHP-based web application deployed on **Amazon EC2** and integrated with **Amazon RDS for MySQL** inside a custom **Amazon VPC**. This project demonstrates practical experience with AWS networking, compute, database integration, security groups, and cloud application deployment.
 
-> **Current status:** The application was deployed and tested during the project. The AWS resources were subsequently deleted to avoid ongoing charges, so the live endpoint is no longer expected to be available.
+## Project Overview
+
+The application enables users to register student details through a web form and view registered records stored in a MySQL database.
+
+**Project status:** Successfully deployed and tested in AWS. The AWS resources were subsequently deleted to avoid ongoing charges; therefore, a live application endpoint is not currently available.
 
 ## Architecture
 
 ![AWS architecture diagram](screenshots/01-architecture-diagram.png)
 
-The intended application traffic flow is:
+### Application workflow
 
-1. A user opens the web application in a browser.
-2. Traffic reaches the PHP application hosted on an EC2 instance in a public subnet.
-3. The application connects to Amazon RDS for MySQL on TCP port **3306**.
-4. The database is placed in private subnets and is not intended to be directly reachable from the public internet.
+1. A user accesses the student registration form through a web browser.
+2. The PHP application hosted on Amazon EC2 processes the submitted information.
+3. The application connects to Amazon RDS for MySQL over TCP port `3306`.
+4. Student records are inserted into the `students` table.
+5. The application retrieves and displays registered student records.
 
-The diagram illustrates a VPC with two public and two private subnets across two Availability Zones. The actual deployment screenshots confirm a custom VPC, four subnets, route tables, one EC2 web server, and an RDS MySQL instance. The second EC2 instance and Auto Scaling/high-availability path shown in the diagram are **optional design concepts**, not confirmed as deployed resources.
+The project uses a custom VPC with public and private subnets, route tables, an Internet Gateway, an EC2 web server, and an RDS MySQL database. The optional second EC2 instance and high-availability path in the architecture illustration represent design concepts, not confirmed deployed resources.
 
-## Application screenshots
+## Application Demonstration
 
-### 1. Registration form and success message
+### Student Registration
 
-![Student registration form showing a successful registration message](screenshots/02-application-registration-success.png)
+![Student registration form and success message](screenshots/02-application-registration-success.png)
 
-The PHP application provides fields for a student's name, email address, course, and optional phone number. The screenshot shows a successful registration message.
+The registration form collects a student's name, email address, course, and optional phone number. The screenshot documents a successful registration during testing.
 
-### 2. Registered students
+### Registered Students
 
-![Registered students displayed in the application](screenshots/03-registered-students-table.png)
+![Registered students displayed in a table](screenshots/03-registered-students-table.png)
 
-The application displays stored student records in a table, including ID, name, email, course, and phone number.
+The application retrieves student records from MySQL and displays information including student ID, name, email, course, and phone number.
 
-## AWS implementation evidence
+## AWS Infrastructure
 
-### 3. EC2 web server
+### Amazon EC2
 
-![EC2 instance details for student-web-server](screenshots/04-ec2-instance-details.png)
+![EC2 instance details](screenshots/04-ec2-instance-details.png)
 
-The EC2 console screenshot shows the `student-web-server` instance in the custom VPC. The instance type shown is `t3.micro`.
+The PHP web application was hosted on an EC2 instance named `student-web-server`. The captured console details show the instance type as `t3.micro`.
 
-### 4. Custom VPC
+### Amazon VPC
 
-![VPC details for student-app-vpc](screenshots/05-vpc-details.png)
+![VPC details](screenshots/05-vpc-details.png)
 
-The VPC is named `student-app-vpc` and uses the IPv4 CIDR block `10.0.0.0/16`.
+A custom VPC named `student-app-vpc` was configured with the IPv4 CIDR block `10.0.0.0/16`.
 
-### 5. VPC resource map
+### VPC Resource Map
 
-![VPC resource map with subnets, route tables, and internet gateway](screenshots/06-vpc-resource-map.png)
+![VPC resource map](screenshots/06-vpc-resource-map.png)
 
-The resource map shows four subnets, route tables, and an Internet Gateway connection.
+The resource map documents the VPC networking components, including subnets, route tables, and Internet Gateway connectivity.
 
-### 6. Subnet layout
+### Subnet Configuration
 
-![Four subnets in the custom VPC](screenshots/07-vpc-subnets.png)
+![VPC subnet configuration](screenshots/07-vpc-subnets.png)
 
-The console lists two public subnets and two private subnets. The subnet CIDRs visible in this screenshot are:
+The AWS console evidence shows two public subnets and two private subnets.
 
 | Subnet | IPv4 CIDR |
 |---|---|
@@ -64,117 +69,95 @@ The console lists two public subnets and two private subnets. The subnet CIDRs v
 | `private-subnet-1` | `10.0.11.0/24` |
 | `private-subnet-2` | `10.0.12.0/24` |
 
-These observed subnet CIDRs differ from the private subnet CIDRs drawn in the architecture illustration; this README follows the AWS console evidence for the actual deployment.
+These values reflect the AWS console screenshots. The private subnet CIDRs in the architecture illustration differ from the console evidence.
 
-### 7. Route tables
+### Route Tables
 
-![Public and private route tables](screenshots/08-vpc-route-tables.png)
+![VPC route tables](screenshots/08-vpc-route-tables.png)
 
-The VPC contains a `student-public-RT` route table and a `student-private-RT` route table, along with the main route table.
+The VPC configuration includes `student-public-RT`, `student-private-RT`, and the main route table.
 
-### 8. RDS security group
+### Database Security Group
 
-![RDS security group allowing MySQL traffic from the EC2 security group](screenshots/09-rds-security-group.png)
+![RDS security group](screenshots/09-rds-security-group.png)
 
-The security group is named `student-RDS-SG`. Its description states that MySQL access is allowed from the student EC2 instance. The visible inbound rule uses MySQL/Aurora TCP port `3306`.
+The `student-RDS-SG` security group documents MySQL/Aurora access on TCP port `3306` from the application server's security group, limiting database access to the intended application tier.
 
-### 9. Amazon RDS for MySQL
+### Amazon RDS for MySQL
 
-![Amazon RDS student-registration-db summary](screenshots/10-rds-mysql-instance.png)
+![RDS database instance details](screenshots/10-rds-mysql-instance.png)
 
-The RDS console screenshot identifies the database instance as `student-registration-db`, using the MySQL Community engine. The screenshot shows database name `mysql` and port `3306`. No database passwords or connection secrets are included in this documentation.
+The managed database instance is named `student-registration-db`. The captured console details show the MySQL Community engine and port `3306`.
 
-### 10. SQL verification
+### SQL Verification
 
-![MySQL query output listing student records](screenshots/11-mysql-query-results.png)
+![MySQL query results](screenshots/11-mysql-query-results.png)
 
-The terminal screenshot shows a query against the `students` table returning four records. This provides evidence that student data was stored in and retrieved from MySQL during testing.
+The SQL output documents successful retrieval of student records from the `students` table during testing.
 
-## AWS services and technologies
+## Technology Stack
 
-- **Amazon VPC:** Custom network boundary for the application.
-- **Public and private subnets:** Network segmentation for the web and database tiers.
-- **Amazon EC2:** Hosts the PHP web application.
-- **Amazon RDS for MySQL:** Managed relational database for student records.
-- **Internet Gateway and route tables:** Provide internet routing for the public tier and route organization within the VPC.
-- **Security groups:** Control traffic to the EC2 instance and database.
-- **PHP, HTML, CSS, and MySQL:** Application and database technologies.
+- **Cloud platform:** Amazon Web Services (AWS)
+- **Compute:** Amazon EC2
+- **Networking:** Amazon VPC, public and private subnets, route tables, Internet Gateway
+- **Database:** Amazon RDS for MySQL
+- **Network security:** AWS security groups
+- **Application:** PHP, HTML, CSS
+- **Database language:** SQL
+- **Tools:** Visual Studio Code, Git, GitHub
 
-## Application workflow
+## Key Skills Demonstrated
 
-1. The user opens the registration page in a browser.
-2. The user enters student details and submits the form.
-3. The PHP application processes the submission.
-4. The application writes the student record to MySQL on Amazon RDS.
-5. The application displays a success message and lists registered students.
+- Deploying a PHP web application on Amazon EC2
+- Creating and configuring a custom VPC
+- Organizing public and private subnets
+- Configuring route tables and Internet Gateway connectivity
+- Provisioning and connecting to Amazon RDS for MySQL
+- Controlling database traffic with security groups
+- Implementing application-to-database connectivity
+- Testing data insertion and retrieval
+- Documenting cloud infrastructure and deployment evidence
 
-## Deployment overview
+## Security Considerations
 
-The following is a high-level summary of the deployment performed for this project. Exact commands and configuration values should be added only after checking the original application files and setup notes.
+- Database credentials should be stored in a protected configuration file or secrets-management service.
+- AWS access keys, passwords, private keys, and other secrets must never be committed to a public repository.
+- Database access should be restricted to the application server's security group.
+- HTTPS/TLS was not demonstrated in the captured deployment and remains a potential improvement.
+- Additional production improvements include stronger input validation, centralized secret management, monitoring, logging, and database backups.
 
-1. Created a custom VPC named `student-app-vpc`.
-2. Created two public subnets and two private subnets.
-3. Configured route tables and an Internet Gateway for the public network path.
-4. Launched an EC2 instance named `student-web-server` for the PHP application.
-5. Created an Amazon RDS for MySQL instance named `student-registration-db`.
-6. Configured the database security group to allow MySQL traffic from the EC2 security group.
-7. Connected the PHP application to the database and tested student registration.
-8. Verified that student records could be queried from MySQL.
-9. Deleted the AWS resources after testing to avoid ongoing charges.
+## Cost Management
 
-## Security notes
+The AWS resources were deleted after testing to avoid ongoing charges. Recreating the environment may incur charges depending on the region, configuration, and resource usage.
 
-- Never commit AWS access keys, private keys, database passwords, session secrets, or `.env` files containing secrets.
-- Keep the RDS database private and permit port `3306` only from the application server's security group.
-- Restrict web-server inbound access to the required ports and trusted sources where practical.
-- The application screenshot uses HTTP and the browser labels the connection “Not secure.” HTTPS/TLS was not demonstrated in the supplied evidence and is a potential improvement.
-- Use environment variables or a protected configuration file for database credentials rather than hard-coding secrets in public source code.
-- Screenshots may expose account or infrastructure identifiers. Review and redact identifiers before publishing if desired.
+## Future Improvements
 
-## Cost management
+- Configure HTTPS/TLS for encrypted browser traffic.
+- Integrate AWS Secrets Manager or another protected credential-management solution.
+- Improve input validation and error handling.
+- Add monitoring, logging, and database backup procedures.
+- Design and test a load-balanced, multi-AZ architecture if high availability is required.
 
-The AWS resources were removed after testing to avoid continued charges. Recreating the environment may incur charges depending on the resources, region, and usage. Check current AWS pricing and billing before deploying again.
-
-## Skills demonstrated
-
-- Creating and organizing a custom VPC
-- Working with public and private subnets
-- Configuring route tables and an Internet Gateway
-- Launching and inspecting an EC2 instance
-- Deploying a PHP application
-- Configuring Amazon RDS for MySQL
-- Restricting database access with security groups
-- Connecting a web application to a relational database
-- Testing inserts and queries in MySQL
-- Documenting cloud architecture and implementation evidence
-
-## Possible future improvements
-
-- Configure HTTPS using a certificate and a suitable endpoint.
-- Move database credentials to a safer secrets-management approach.
-- Add input validation, error handling, and protection against SQL injection using parameterized queries.
-- Add backups, monitoring, and logging.
-- If high availability is required, design and test a load-balanced, multi-AZ architecture rather than implying that the optional second web server is already deployed.
-
-## Repository structure
+## Repository Structure
 
 ```text
 aws-student-registration-app/
 ├── README.md
-├── screenshots/
-│   ├── 01-architecture-diagram.png
-│   ├── 02-application-registration-success.png
-│   ├── 03-registered-students-table.png
-│   ├── 04-ec2-instance-details.png
-│   ├── 05-vpc-details.png
-│   ├── 06-vpc-resource-map.png
-│   ├── 07-vpc-subnets.png
-│   ├── 08-vpc-route-tables.png
-│   ├── 09-rds-security-group.png
-│   ├── 10-rds-mysql-instance.png
-│   └── 11-mysql-query-results.png
-└── src/
-    └── (add the PHP application files)
+├── index.php
+├── style.css
+└── screenshots/
+    ├── 01-architecture-diagram.png
+    ├── 02-application-registration-success.png
+    ├── 03-registered-students-table.png
+    ├── 04-ec2-instance-details.png
+    ├── 05-vpc-details.png
+    ├── 06-vpc-resource-map.png
+    ├── 07-vpc-subnets.png
+    ├── 08-vpc-route-tables.png
+    ├── 09-rds-security-group.png
+    ├── 10-rds-mysql-instance.png
+    └── 11-mysql-query-results.png
 ```
 
-> **Before publishing:** Add your actual PHP/HTML/CSS source files to the repository and review them for credentials and personal data. The `src/` directory above is a suggested structure; create it only if you choose to organize your application files that way.
+**Author:** Mohammed Hashir 
+**Project:** AWS Student Registration Web Application
