@@ -160,4 +160,5 @@ aws-student-registration-app/
 ```
 
 **Author:** Mohammed Hashir 
+
 **Project:** AWS Student Registration Web Application
